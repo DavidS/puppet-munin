@@ -41,7 +41,9 @@
 #
 # [*autoconfigure*]
 #   Boolean that defines if you want to autoconfigure plugins: Default: true
-#   If true a nightly cron jobs re-runs the munin autoconfigure script
+#   If true a nightly cron jobs re-runs the munin autoconfigure script.
+#   Set to 'once' to run the autoconfigure only when installing or upgrading
+#   the package.
 #
 # [*package_perlcidr*]
 #   Name of the Perl-Net CIDR package, required by the module for Munin
@@ -343,7 +345,10 @@ class munin (
 
   $bool_server_local=any2bool($server_local)
   $bool_extra_plugins=any2bool($extra_plugins)
-  $bool_autoconfigure=any2bool($autoconfigure)
+  $bool_autoconfigure= $autoconfigure ? {
+    'once'  => false,
+    default => any2bool($autoconfigure),
+  }
 
   $bool_source_dir_purge=any2bool($source_dir_purge)
   $bool_include_dir_purge=any2bool($include_dir_purge)
@@ -455,7 +460,7 @@ class munin (
     include munin::extra
   }
 
-  if $munin::bool_autoconfigure == true {
+  if $munin::bool_autoconfigure {
     file { 'munin-autoconfigure':
       ensure  => $munin::manage_file,
       path    => '/etc/cron.daily/munin-autoconfigure',
@@ -471,6 +476,14 @@ class munin (
     file { 'munin-autoconfigure':
       ensure  => 'absent',
       path    => '/etc/cron.daily/munin-autoconfigure',
+    }
+  }
+
+  if $munin::autoconfigure == 'once' {
+    exec { 'munin-autoconfigure':
+      command     => '/usr/sbin/munin-node-configure --shell 2> /dev/null | /bin/sh',
+      refreshonly => true,
+      subscribe   => Package['munin-node'],
     }
   }
 
