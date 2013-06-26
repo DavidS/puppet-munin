@@ -28,11 +28,16 @@ define munin::plugin (
   $source = '',
   $source_config = '',
   $linkplugins = '',
+  $linktarget = '',
   $content = '',
   $content_config = '',
   $enable = true ) {
 
   $ensure = bool2ensure($enable)
+  $manage_linktarget = $linktarget ? {
+    '' => $name,
+    default => $linktarget,
+  }
 
   if $source {
     file { "Munin_plugin_${name}":
@@ -48,7 +53,7 @@ define munin::plugin (
 	if $linkplugins == true {
       file  { "/etc/munin/plugins/${name}":
             ensure => link,
-            target => "${munin::plugins_dir}/${name}",
+            target => "${munin::plugins_dir}/${manage_linktarget}",
         	}
     }
 
@@ -56,7 +61,7 @@ define munin::plugin (
 
   if $content {
     file { "Munin_plugin_${name}":
-      path    => "${munin::plugins_dir}/${name}",
+      path    => "${munin::plugins_dir}/${manage_linktarget}",
       owner   => root,
       group   => root,
       mode    => '0755',
@@ -68,7 +73,7 @@ define munin::plugin (
 	if $linkplugins == true {
       file  { "/etc/munin/plugins/${name}":
             ensure => link,
-            target => "${munin::plugins_dir}/${name}",
+            target => "${munin::plugins_dir}/${manage_linktarget}",
         	}
     }
   }
