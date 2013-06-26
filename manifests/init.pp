@@ -467,6 +467,11 @@ class munin (
       replace => $munin::manage_file_replace,
       audit   => $munin::manage_audit,
     }
+  } else {
+    file { 'munin-autoconfigure':
+      ensure  => 'absent',
+      path    => '/etc/cron.daily/munin-autoconfigure',
+    }
   }
 
   if $munin::package_perlcidr != '' {
