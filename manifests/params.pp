@@ -154,6 +154,15 @@ class munin::params {
 
   $fcgi_reload_init = true
 
+  $fcgi_spawn_package = $::operatingsystem ? {
+    /(?i:Ubuntu|Debian|Mint)/ => "spawn-fcgi",
+    default                   => "spawn-fcgi", # untested
+  }
+  $fcgi_perl_package=$::operatingsystem ? {
+    /(?i:Ubuntu|Debian|Mint)/ => "libcgi-fast-perl",
+    default                   => "libcgi-fast-perl",# untested
+  }
+
   $port = '4949'
   $protocol = 'tcp'
 
