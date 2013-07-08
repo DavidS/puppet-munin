@@ -114,6 +114,8 @@ define munin::plugin (
       default   => 'absent',
     },
     target => $real_target,
+    require => Package['munin-node'],
+    notify  => $munin::manage_service_autorestart,
   }
 
   file { "Munin_plugin_conf_${name}":
