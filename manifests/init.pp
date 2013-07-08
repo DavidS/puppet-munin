@@ -385,6 +385,12 @@ class munin (
     false => $munin::version,
   }
 
+  # non-src:munin packages fail to install when a specific munin version is specified
+  $manage_aux_package = $munin::bool_absent ? {
+    true  => 'absent',
+    false => 'present',
+  }
+
   $manage_service_enable = $munin::bool_disableboot ? {
     true    => false,
     default => $munin::bool_disable ? {
@@ -489,7 +495,7 @@ class munin (
 
   if $munin::package_perlcidr != '' {
     package { 'perl-cidrmunin':
-      ensure => $munin::manage_package,
+      ensure => $munin::manage_aux_package,
       name   => $munin::package_perlcidr,
     }
   }
