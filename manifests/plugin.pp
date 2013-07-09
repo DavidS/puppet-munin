@@ -8,6 +8,10 @@
 # [*ensure*]
 #   Specify whether this plugin should be present or absent. Default: present
 #
+# [*manage_script*]
+#   When using a system provided plugin, or linking to the same script multiple times, it is not
+#   necessary to manage it (multiple times). This parameter allows you to skip that. Default: true
+#
 # [*path*]
 #   Specify the actual location of the plugin script. Default: "${munin::plugins_dir}/${name}"
 #
@@ -67,6 +71,7 @@
 define munin::plugin (
   $ensure         = 'present',
   $path           = '',
+  $manage_script  = true,
   $source         = '',
   $content        = '',
   $target         = '',
@@ -88,32 +93,34 @@ define munin::plugin (
     default => $path,
   }
 
-  file { "Munin_plugin_${name}":
-    ensure  => $ensure,
-    path    => $real_path,
-    mode    => '0755',
-    owner   => $munin::config_file_owner,
-    group   => $munin::config_file_group,
-    require => Package['munin-node'],
-    notify  => $munin::manage_service_autorestart,
-  }
+  if $manage_script {
+    file { "Munin_plugin_${name}":
+      ensure  => $ensure,
+      path    => $real_path,
+      mode    => '0755',
+      owner   => $munin::config_file_owner,
+      group   => $munin::config_file_group,
+      require => Package['munin-node'],
+      notify  => $munin::manage_service_autorestart,
+    }
 
-  if $source != '' {
-    File["Munin_plugin_${name}"] {
-      source => $source, }
-  }
+    if $source != '' {
+      File["Munin_plugin_${name}"] {
+        source => $source, }
+    }
 
-  if $content != '' {
-    File["Munin_plugin_${name}"] {
-      content => $content, }
+    if $content != '' {
+      File["Munin_plugin_${name}"] {
+        content => $content, }
+    }
   }
 
   file { "${munin::conf_dir_active_plugins}/${name}":
-    ensure => $ensure ? {
+    ensure  => $ensure ? {
       'present' => 'link',
       default   => 'absent',
     },
-    target => $real_target,
+    target  => $real_target,
     require => Package['munin-node'],
     notify  => $munin::manage_service_autorestart,
   }
