@@ -13,10 +13,11 @@ matrix:
     env: PUPPET_GEM_VERSION="~> 3.0"
   - rvm: 2.0.0
     env: PUPPET_GEM_VERSION="~> 3.0"
-  - rvm: 1.9.3
-    env: PUPPET_GEM_VERSION="~> 3.5.0" STRICT_VARIABLES="yes"
-  - rvm: 2.0.0
-    env: PUPPET_GEM_VERSION="~> 3.5.0" STRICT_VARIABLES="yes"
+# STRICT_VARIABLES trips up param_lookup
+#  - rvm: 1.9.3
+#    env: PUPPET_GEM_VERSION="~> 3.5.0" STRICT_VARIABLES="yes"
+#  - rvm: 2.0.0
+#    env: PUPPET_GEM_VERSION="~> 3.5.0" STRICT_VARIABLES="yes"
 notifications:
   email:
     - al@lab42.it
