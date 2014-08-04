@@ -49,9 +49,11 @@ define munin::plugin (
     }
 
     if $linkplugins == true {
-      file  { "/etc/munin/plugins/${name}":
-        ensure => link,
-        target => "${munin::plugins_dir}/${name}",
+      file { "/etc/munin/plugins/${name}":
+        ensure  => link,
+        target  => "${munin::plugins_dir}/${name}",
+        require => Package['munin-node'],
+        notify  => Service['munin-node'],
       }
     }
   }
@@ -69,9 +71,11 @@ define munin::plugin (
     }
 
     if $linkplugins == true {
-      file  { "/etc/munin/plugins/${name}":
-        ensure => link,
-        target => "${munin::plugins_dir}/${name}",
+      file { "/etc/munin/plugins/${name}":
+        ensure  => link,
+        target  => "${munin::plugins_dir}/${name}",
+        require => Package['munin-node'],
+        notify  => Service['munin-node'],
       }
     }
   }
